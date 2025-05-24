@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NikeSneakify</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background: linear-gradient(to right, #f0f4f8, #d9e2ec);
+      font-family: Arial, sans-serif;
+      transition: background 0.5s ease-in-out;
+    }
+    .fade-enter {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+    .fade-enter-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .sneaker {
+      width: 100%;
+      height: 180px; /* Fixed height for uniformity */
+      object-fit: cover; /* Ensures the image fills the container without distortion */
+      border-radius: 8px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    }
+    .sneaker:hover {
+      transform: scale(1.05); /* Slight zoom effect on hover */
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px; /* Space between grid items */
+      padding: 20px; /* Add padding around the grid */
+      margin-top: 20px;
+      transition: all 0.4s ease-in-out;
+    }
+    .buy-btn {
+      margin-top: 10px;
+      background-color: black;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .buy-btn:hover {
+      background-color: #333;
+    }
+    .card {
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="navbar">
+      <button class="nav-btn" data-page="home">Home</button>
+      <button class="nav-btn" data-page="ai">AI</button>
+      <button class="nav-btn" data-page="shop">Shop</button>
+      <button class="nav-btn" data-page="testimonials">Testimonials</button>
+      <button class="nav-btn" data-page="about">About</button>
+      <button class="nav-btn" data-page="feedback">Feedback</button>
+    </nav>
+
+    <main id="app-content" class="fade-enter"></main>
+  </div>
+
+  <script>
+  let sneakers = [];
+  let futureReleases = [
+    {
+      name: "Nike Air Zoom Pegasus 40",
+      releaseDate: "2025-06-15",
+      img: "images/air-zoom-pegasus-40.png"
+    },
+    {
+      name: "Nike Dunk Low Retro",
+      releaseDate: "2025-07-01",
+      img: "images/dunk-low-retro.png"
+    },
+    {
+      name: "Nike Air Force 1 '07",
+      releaseDate: "2025-08-10",
+      img: "images/air-force-1-07.png"
+    }
+  ];
+
+  // Fetch sneaker data from the JSON file
+  fetch('sneakers.json')
+    .then(response => response.json())
+    .then(data => {
+      sneakers = data;
+      navigate("home"); // Initialize the home page after loading data
+    })
+    .catch(error => console.error('Error loading sneaker data:', error));
+
+  const pages = {
+    home: () => `
+      <div class='card'>
+        <h2>Welcome to NikeSneakify 👟</h2>
+        <p>Discover and shop your favorite sneakers, all in one place.</p>
+        
+        <h2>Available Sneakers</h2>
+        <div class='grid'>
+          ${sneakers.map((s, i) => `
+            <div class='card' onclick="navigate('shop', ${i})">
+              <img src="${s.img}" class="sneaker" alt="${s.name}">
+              <h3>${s.name}</h3>
+              <p>${s.price}</p>
+            </div>`).join('')}
+        </div>
+        
+        <h2>Future Releases</h2>
+        <div class='grid'>
+          ${futureReleases.map((release) => `
+            <div class='card' onclick="alert('${release.name} will be available on ${release.releaseDate}')">
+              <img src="${release.img}" class="sneaker" alt="${release.name}">
+              <h3>${release.name}</h3>
+              <p>Release Date: ${release.releaseDate}</p>
+            </div>`).join('')}
+        </div>
+      </div>`,
+
+    ai: `
+      <div class='card'>
+        <h2>AI Sneaker Assistant</h2>
+        <p>Tell us your style and we’ll match you with the perfect pair.</p>
+        <input type="text" id="styleInput" placeholder="e.g. sporty, bold...">
+        <button onclick="generateMatch()">Suggest Sneaker</button>
+        <p id="aiResponse" style="margin-top: 10px;"></p>
+        <h2>Fashion Tips</h2>
+        <ul>
+          <li>Pair your sneakers with slim-fit jeans for a casual look.</li>
+          <li>Use bold-colored sneakers to make a statement.</li>
+          <li>Match your sneakers with accessories like caps or bags.</li>
+        </ul>
+        <h2>Other Popular Shoes</h2>
+        <div class='grid'>
+          ${sneakers.slice(0, 3).map((s) => `
+            <div class='card'>
+              <img src="${s.img}" class="sneaker" alt="${s.name}">
+              <h3>${s.name}</h3>
+              <p>${s.price}</p>
+            </div>`).join('')}
+        </div>
+        <button class='buy-btn' onclick="navigate('home')">← Back</button>
+      </div>`,
+
+    shop: (index = null) => `
+      <div class='card'>
+        <h2>Shop Sneakers</h2>
+        <div class='grid'>
+          ${sneakers.map((s, i) => `
+            <div class='card'>
+              <img src="${s.img}" class="sneaker" alt="${s.name}">
+              <h3>${s.name}</h3>
+              <p>${s.price}</p>
+              <button class='buy-btn' onclick="alert('Thank you for buying the ${s.name}!')">Buy Now</button>
+            </div>`).join('')}
+        </div>
+        <button class='buy-btn' onclick="navigate('home')">← Back</button>
+      </div>`,
+
+    testimonials: `
+      <div class='card'>
+        <h2>What Our Customers Say</h2>
+        <blockquote>“AI gave me the freshest pair I’ve ever owned.” – Keitumetse, Gaborone</blockquote>
+        <blockquote>“Sneakify made it effortless to find my perfect kicks.” – Thabiso, Molepolole</blockquote>
+        <button class='buy-btn' onclick="navigate('home')">← Back</button>
+      </div>`,
+
+    about: `
+      <div class='card'>
+        <h2>About NikeSneakify</h2>
+        <p><strong>Slogan:</strong> "Step into the future of footwear."</p>
+        <p><strong>Contact Information:</strong></p>
+        <ul>
+          <li><strong>Name:</strong> Maatla Ted Moranyane</li>
+          <li><strong>Email:</strong> tmoranyane3@gmail.com</li>
+          <li><strong>Phone:</strong> +26772211443</li>
+        </ul>
+        <p>NikeSneakify is your AI-powered sneaker matchmaker. We use intelligent styling to help you find your next pair of Nikes, tailored to your vibe.</p>
+        <button class='buy-btn' onclick="navigate('home')">← Back</button>
+      </div>`,
+
+    feedback: `
+      <div class='card'>
+        <h2>We’d Love Your Feedback</h2>
+        <textarea id="feedbackText" placeholder="Your thoughts..."></textarea><br>
+        <button onclick="submitFeedback()">Submit</button>
+        <p id="feedbackResponse" style="margin-top: 10px;"></p>
+        <button class='buy-btn' onclick="navigate('home')">← Back</button>
+      </div>`
+  };
+
+  function navigate(page, index = null) {
+    const content = document.getElementById('app-content');
+    content.classList.remove('fade-enter-active');
+    content.innerHTML = typeof pages[page] === 'function' ? pages[page](index) : pages[page];
+    setTimeout(() => content.classList.add('fade-enter-active'), 10);
+  }
+
+  function generateMatch() {
+    const input = document.getElementById("styleInput").value;
+    const pick = sneakers[Math.floor(Math.random() * sneakers.length)];
+    document.getElementById("aiResponse").textContent = `You said "${input}" — your perfect match is the ${pick.name}`;
+  }
+
+  function submitFeedback() {
+    const msg = document.getElementById("feedbackText").value;
+    document.getElementById("feedbackResponse").textContent = "Thanks for your feedback!";
+    setTimeout(() => navigate("home"), 2000);
+  }
+
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      navigate(btn.getAttribute('data-page'));
+    });
+  });
+
+  // Set default
+  navigate("home");
+  </script>
+</body>
+</html>

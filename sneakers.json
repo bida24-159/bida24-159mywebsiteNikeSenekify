@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Nike Air Max 97",
+    "price": "P2,430",
+    "img": "images/air-max-97.png"
+  },
+  {
+    "name": "Jordan Retro 4",
+    "price": "P2,835",
+    "img": "images/jordan-retro-4.png"
+  },
+  {
+    "name": "Nike Blazer Mid '77",
+    "price": "P1,420",
+    "img": "images/blazer-mid-77.png"
+  }
+]
